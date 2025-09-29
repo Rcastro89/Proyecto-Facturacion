@@ -26,12 +26,12 @@ namespace Billing.Infrastructure.Repositories
                 {
                     IdClient = dataConsult.GetInt32(0),
                     Name = dataConsult.GetString(1),
-                    Lastname = dataConsult.GetString(2),
+                    Lastname = dataConsult.IsDBNull(2) ? null : dataConsult.GetString(2),
                     Address = dataConsult.GetString(3),
                     Phone = dataConsult.GetString(4),
                     Email = dataConsult.GetString(5),
                     Nit = dataConsult.GetString(6),
-                    FullName = $"{dataConsult.GetString(1)} {dataConsult.GetString(2)}"
+                    FullName = $"{dataConsult.GetString(1)} {(dataConsult.IsDBNull(2) ? string.Empty : dataConsult.GetString(2))}"
                 });
             }
 

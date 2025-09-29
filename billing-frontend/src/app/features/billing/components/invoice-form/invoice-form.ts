@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
@@ -32,13 +32,13 @@ export class InvoiceFormComponent implements OnInit {
   tax = 0;
   total = 0;
   loading = false;
-  loadingInit = false;
 
   private readonly customerService: ICustomerService = inject(CustomerService);
   private readonly invoiceService: IInvoiceService = inject(InvoiceService);
   private readonly productService: IProductService = inject(ProductService);
   private readonly cdr = inject(ChangeDetectorRef);
-  
+  private readonly zone = inject(NgZone)
+
   constructor(
   ) {
     this.addLine();
@@ -133,11 +133,13 @@ export class InvoiceFormComponent implements OnInit {
   }
 
   onNew() {
-    this.clientId = null;
-    this.lines = [];
-    this.addLine();
-    this.subtotal = this.tax = this.total = 0;
-    this.getLastInvoice();
+    this.zone.run(() => {
+      this.clientId = null;
+      this.lines = [];
+      this.addLine();
+      this.subtotal = this.tax = this.total = 0;
+      this.getLastInvoice();
+    });
   }
 
   async onSave() {
@@ -146,10 +148,9 @@ export class InvoiceFormComponent implements OnInit {
       alert('Seleccione un cliente para guardar la factura.');
       return;
     }
-    if (this.lines.length === 0 || 
-      this.lines.every(l => !l.idProduct) || 
-      this.lines.some(l => l.idProduct == 0 || l.idProduct == null))
-    {
+    if (this.lines.length === 0 ||
+      this.lines.every(l => !l.idProduct) ||
+      this.lines.some(l => l.idProduct == 0 || l.idProduct == null)) {
       console.error('No lines in the invoice');
       alert('La factura no tiene productos para guardar.');
       return;
@@ -172,13 +173,16 @@ export class InvoiceFormComponent implements OnInit {
       const res = await firstValueFrom(this.invoiceService.createInvoice(invoice));
       console.log('peticion ', responseUrl(res));
       alert('Factura guardada con éxito');
-      this.onNew();
+      this.zone.run(() => {
+        this.loading = false;
+        this.onNew();
+      });
     } catch (err) {
       console.error('Error saving invoice', err);
+      this.zone.run(() => {
+        this.loading = false;
+      });
       alert('Error al guardar la factura');
-    } finally {
-      this.loading = false;
-      this.cdr.detectChanges();
     }
   }
 }
