@@ -1,0 +1,70 @@
+<div class="page">
+    <h4 class="title">Proyecto de componentes</h4>
+
+    <div class="search-box card">
+        <div class="field">
+            <label for="tipe-client">Tipo de Búsqueda</label>
+            <div class="radio-group">
+                <label>
+                    <input type="radio" [(ngModel)]="searchType" value="client" (ngModelChange)="finshConsult()" /> Cliente
+                </label>
+                <label>
+                    <input type="radio" [(ngModel)]="searchType" value="invoice" /> Número Factura
+                </label>
+            </div>
+        </div>
+
+        <div class="search-fields">
+            <div class="field">
+                <label for="clientList">Cliente</label>
+                <select id="clientList" [(ngModel)]="clientId" [disabled]="searchType !== 'client'"
+                    [ngModelOptions]="{standalone: true}">
+                    <option [ngValue]="null">-- Select --</option>
+                    @for (c of customers; track c.idClient) {
+                    <option [ngValue]="c.idClient">{{ c.fullName }}</option>
+                    }
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="invoiceNumber">Número de Factura</label>
+                <input id="invoiceNumber" [(ngModel)]="invoiceNumber" [disabled]="searchType !== 'invoice'" />
+            </div>
+
+            <div class="actions">
+                <button class="btn" (click)="onSearch()" [disabled]="loading">
+                    {{ loading ? 'Buscando...' : 'Buscar' }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    @if (results.length > 0) {
+    <div class="results card">
+        <div class="results-header">
+            <h5>
+                Cliente: {{ results[0].fullName }}
+            </h5>
+        </div>
+
+        <table class="results-table">
+            <thead>
+                <tr>
+                    <th>Número de factura</th>
+                    <th>Fecha Emisión</th>
+                    <th>Total facturado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (r of results; track r.invoiceNumber) {
+                <tr>
+                    <td>{{ r.invoiceNumber }}</td>
+                    <td>{{ r.invoiceDate | date:'dd/MM/yyyy' }}</td>
+                    <td>{{ r.totalInvoice | number:'1.0-0' }}</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    }
+</div>

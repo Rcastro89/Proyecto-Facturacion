@@ -1,0 +1,109 @@
+<div class="page">
+  <h4 class="title">Proyecto de componentes</h4>
+
+  <div class="toolbar">
+    <div class="new-label">Nueva factura</div>
+    <button class="btn small" (click)="onNew()">Nuevo</button>
+  </div>
+
+  <div class="card">
+    <div class="top-row">
+      <div class="field">
+        <label for="clientList">Cliente</label>
+        <select [(ngModel)]="clientId" (change)="onCustomerChange(clientId)" [ngModelOptions]="{standalone: true}">
+          <option [ngValue]="null">-- Select --</option>
+          @for (c of customers; track c.idClient) {
+          <option [ngValue]="c.idClient">
+            {{ c.fullName }}
+          </option>
+          }
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="invoiceNumber">Numero de Factura</label>
+        <input id="invoiceNumber" [(ngModel)]="invoiceNumber" readonly />
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn" (click)="addLine()">Agregar producto</button>
+    </div>
+
+    <div class="table-wrap">
+      <table class="lines">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Precio Unitario</th>
+            <th>Cantidad</th>
+            <th>Imagen</th>
+            <th>Totales</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (line of lines; let i = $index; track line.idProduct) {
+          <tr>
+            <td>
+              <select [(ngModel)]="line.idProduct" (change)="onProductChange(line.idProduct, i)"
+                [ngModelOptions]="{standalone: true}">
+                <option [ngValue]="null">-- Select --</option>
+                @for (product of products; track product.idProduct) {
+                <option [value]="product.idProduct">
+                  {{ product.description }}
+                </option>
+                }
+              </select>
+            </td>
+            <td><input [value]="line.price | number:'1.0-0'" disabled /></td>
+            <td><input type="number" [(ngModel)]="line.quantity" (ngModelChange)="recalcLine(line, i)"
+                [ngModelOptions]="{standalone: true}" /></td>
+            <td class="img-cell">
+              @if (line.imageUrl) {
+                <img [src]="line.imageUrl" [alt]="line.description" width="50" height="50" />
+              }
+            </td>
+            <td><input [value]="line.total | number:'1.0-0'" disabled /></td>
+            <td><button class="btn small" (click)="removeLine(i)">Remove</button></td>
+          </tr>
+          }
+        </tbody>
+      </table>
+
+      <div class="summary">
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th>Descripción</th>
+              <th>Valor</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Sub total</td>
+              <td>{{ subtotal | number:'1.0-0' }}</td>
+            </tr>
+            <tr>
+              <td>Impuestos (19%)</td>
+              <td>{{ tax | number:'1.0-0' }}</td>
+            </tr>
+            <tr class="total-row">
+              <td>Total</td>
+              <td>{{ total | number:'1.0-0' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="save-area">
+      <button (click)="onSave()" [disabled]="loading">
+        {{ loading ? 'Guardando...' : 'Guardar' }}
+      </button>
+      @if (loading) {
+      <div class="spinner">Loading...</div>
+      }
+    </div>
+  </div>
+</div>

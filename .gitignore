@@ -1,0 +1,37 @@
+# ===============================
+# Backend (.NET)
+# ===============================
+
+# Carpetas de build
+**/bin/
+**/obj/
+
+# Archivos del IDE
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+
+# Archivos de paquetes NuGet
+*.nupkg
+*.snupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# ===============================
+# Frontend (Angular)
+# ===============================
+billing-frontend/node_modules/
+billing-frontend/dist/
+billing-frontend/.angular/
+billing-frontend/package-lock.json
+billing-frontend/npm-debug.log
+
+# ===============================
+# Sistema
+# ===============================
+.DS_Store
+Thumbs.db
